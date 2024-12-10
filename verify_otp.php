@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($result->num_rows === 0) {
             // Insert new user if not found
-            $stmt = $mysqli->prepare('INSERT INTO users (email, first_name, last_name) VALUES (?, "", "", NOW())');
+            $stmt = $mysqli->prepare('INSERT INTO users (email, first_name, last_name, last_logged_in) VALUES (?, "", "", NOW())');
             $stmt->bind_param('s', $email);
             $stmt->execute();
         } else {
@@ -38,8 +38,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     } else {
         $_SESSION['message'] = "Invalid OTP, please try again.";
-        header('Location: index.php');
-        exit();
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Verify OTP</title>
+</head>
+<body>
+    <h1>Verify Your OTP</h1>
+
+    <?php
+    if (isset($_SESSION['message'])) {
+        echo "<p style='color: red'>{$_SESSION['message']}</p>";
+        unset($_SESSION['message']);
+    }
+    ?>
+
+    <form method="POST">
+        <label for="otp">Enter OTP:</label>
+        <input type="text" name="otp" id="otp" required>
+        <button type="submit">Verify OTP</button>
+    </form>
+</body>
+</html>
