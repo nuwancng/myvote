@@ -8,23 +8,33 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
-// Database connection
 $mysqli = db_connect();
 
-// Get the user details
+// Fetch user details
 $stmt = $mysqli->prepare('SELECT * FROM users WHERE email = ?');
 $stmt->bind_param('s', $_SESSION['email']);
 $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-// Get the current user's vote
+// Fetch the user's vote
 $stmt = $mysqli->prepare('SELECT response FROM votes WHERE user_id = ?');
 $stmt->bind_param('i', $user['id']);
 $stmt->execute();
-$result = $stmt->get_result();
-$current_vote = $result->fetch_assoc();
-$current_response = $current_vote['response'] ?? '';
+$vote_result = $stmt->get_result();
+$user_vote = $vote_result->fetch_assoc();
+
+// Fetch vote counts and total votes
+$stmt = $mysqli->prepare('SELECT response, COUNT(*) AS count FROM votes GROUP BY response');
+$stmt->execute();
+$vote_counts_result = $stmt->get_result();
+
+$total_votes = 0;
+$vote_counts = [];
+while ($row = $vote_counts_result->fetch_assoc()) {
+    $vote_counts[$row['response']] = $row['count'];
+    $total_votes += $row['count'];
+}
 ?>
 
 <!DOCTYPE html>
@@ -33,56 +43,70 @@ $current_response = $current_vote['response'] ?? '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Vote Page</title>
-    <!-- Include Twitter Bootstrap -->
+    <title>User Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body>
-    <!-- Main container -->
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8 col-lg-6">
-                <!-- Voting Card -->
+                <!-- Dashboard Card -->
                 <div class="card shadow-sm">
-                    <div class="card-header text-center bg-success text-white">
-                        <h4>Vote Now</h4>
+                    <div class="card-header text-center bg-primary text-white">
+                        <h4>User Dashboard</h4>
                     </div>
                     <div class="card-body">
-                        <!-- Welcome Message -->
-                        <div class="mb-3">
-                            <h5>Welcome, <?php echo htmlspecialchars($user['email']); ?>!</h5>
-                            <p class="text-muted">Please select your response below:</p>
-                        </div>
+                        <h5 class="text-center">Welcome, <?php echo htmlspecialchars($user['email']); ?>!</h5>
+                        <p class="text-muted text-center">Here's your information:</p>
 
-                        <!-- Voting Form -->
-                        <form action="submit_vote.php" method="POST">
-                            <div class="mb-3">
-                                <label for="response" class="form-label">Your Response</label>
-                                <select class="form-select" id="response" name="response" required>
-                                    <option value="" disabled>Select your option</option>
-                                    <option value="Yes" <?php echo $current_response === 'Yes' ? 'selected' : ''; ?>>Yes</option>
-                                    <option value="No" <?php echo $current_response === 'No' ? 'selected' : ''; ?>>No</option>
-                                    <option value="Maybe" <?php echo $current_response === 'Maybe' ? 'selected' : ''; ?>>Maybe</option>
-                                </select>
-                            </div>
-                            <div class="text-center">
-                                <button type="submit" class="btn btn-primary">Submit Vote</button>
-                            </div>
-                        </form>
+                        <!-- User Info -->
+                        <ul class="list-group mb-4">
+                            <li class="list-group-item">
+                                <strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Last Logged In:</strong> 
+                                <?php echo $user['last_logged_in'] ? htmlspecialchars($user['last_logged_in']) : "Never"; ?>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>Your Vote:</strong> 
+                                <?php echo $user_vote ? htmlspecialchars($user_vote['response']) : "Not Voted Yet"; ?>
+                                <a href="vote.php" class="btn btn-link">Change Vote</a>
+                            </li>
+                        </ul>
+
+                        <!-- Vote Statistics -->
+                        <h5 class="text-center mb-3">Vote Statistics</h5>
+                        <ul class="list-group">
+                            <?php foreach ($vote_counts as $response => $count): ?>
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <?php echo htmlspecialchars($response); ?>
+                                    <span class="badge bg-primary">
+                                        <?php 
+                                            $percentage = $total_votes > 0 ? round(($count / $total_votes) * 100, 2) : 0;
+                                            echo "{$count} votes ({$percentage}%)"; 
+                                        ?>
+                                    </span>
+                                </li>
+                            <?php endforeach; ?>
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <strong>Total Votes</strong>
+                                <span class="badge bg-success"><?php echo $total_votes; ?></span>
+                            </li>
+                        </ul>
 
                         <!-- Logout Button -->
-                        <!--<div class="mt-4 text-center">
+                        <div class="mt-4 text-center">
                             <a href="logout.php" class="btn btn-danger">Logout</a>
-                        </div>-->
+                        </div>
                     </div>
                 </div>
-                <!-- End of Voting Card -->
+                <!-- End of Dashboard Card -->
             </div>
         </div>
     </div>
 
-    <!-- Include Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
