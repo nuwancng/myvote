@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['response'])) {
         $_SESSION['message'] = 'Unable to find your user details.';
     }
 
-    header('Location: vote.php');
+    header('Location: dashboard.php');
     exit();
 } else {
     $_SESSION['message'] = 'Invalid request.';
