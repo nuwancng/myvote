@@ -44,24 +44,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Verify OTP</title>
+    <!-- Include Twitter Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
-    <h1>Verify Your OTP</h1>
+    <!-- Main Content -->
+    <div class="container d-flex align-items-center justify-content-center min-vh-100">
+        <div class="card p-4 shadow" style="width: 100%; max-width: 400px;">
+            <h3 class="text-center mb-4">OTP Verification</h3>
 
-    <?php
-    if (isset($_SESSION['message'])) {
-        echo "<p style='color: red'>{$_SESSION['message']}</p>";
-        unset($_SESSION['message']);
-    }
-    ?>
+            <!-- Display Messages -->
+            <?php if (isset($_SESSION['message'])) { ?>
+                <div class="alert alert-danger" role="alert">
+                    <?php echo $_SESSION['message'];
+                    unset($_SESSION['message']); ?>
+                </div>
+            <?php } ?>
 
-    <form method="POST">
-        <label for="otp">Enter OTP:</label>
-        <input type="text" name="otp" id="otp" required>
-        <button type="submit">Verify OTP</button>
-    </form>
+            <!-- OTP Form -->
+            <form method="POST">
+                <div class="mb-3">
+                    <label for="otp" class="form-label">Enter Your OTP</label>
+                    <input type="text" class="form-control" id="otp" name="otp" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Verify OTP</button>
+            </form>
+
+            <div class="text-center mt-3">
+                <p class="text-muted">Didn't receive an OTP? <a href="index.php">Try again</a>.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
