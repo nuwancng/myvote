@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->Host       = 'mail.spacemail.com'; // Use your SMTP provider
         $mail->SMTPAuth   = true;
         $mail->Username   = 'info@myvote.click'; // Replace with your email
-        $mail->Password   = ''; // Replace with your app password
+        $mail->Password   = ''; // Replace with your SMTP password or app password
         $mail->SMTPSecure = 'ssl';
         $mail->Port       = 465;
 
@@ -59,7 +59,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Send the email
         if ($mail->send()) {
-            header('Location: index.php');
+            $_SESSION['message'] = 'OTP sent successfully to your email.';
+            header('Location: verify_otp.php');
             exit();
         } else {
             $_SESSION['message'] = 'Failed to send OTP. Please try again.';
