@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mail->Host       = 'mail.spacemail.com'; // Use your SMTP provider
         $mail->SMTPAuth   = true;
         $mail->Username   = 'info@myvote.click'; // Replace with your email
-        $mail->Password   = '5fFDD108-d847-4f15-Bf4a-c6B89e88C53D'; // Replace with your app password
+        $mail->Password   = ''; // Replace with your app password
         $mail->SMTPSecure = 'ssl';
         $mail->Port       = 465;
 
