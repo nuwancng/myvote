@@ -1,4 +1,14 @@
 <?php session_start(); ?>
+
+<?php
+// Check if user is already logged in
+if (isset($_SESSION['email'])) {
+    header('Location: dashboard.php');
+    exit();
+}
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
