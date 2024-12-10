@@ -28,6 +28,14 @@ if ($vote_result->num_rows > 0) {
     $row = $vote_result->fetch_assoc();
     $current_response = $row['response'];
 }
+
+// Define dropdown options
+$options = [
+    'Option A',
+    'Option B',
+    'Option C',
+    'Option D'
+];
 ?>
 
 <!DOCTYPE html>
@@ -50,8 +58,16 @@ if ($vote_result->num_rows > 0) {
                 <?php } ?>
                 <form action="submit_vote.php" method="POST">
                     <div class="mb-3">
-                        <label for="response" class="form-label">Your Vote</label>
-                        <input type="text" class="form-control" id="response" name="response" required value="<?php echo htmlspecialchars($current_response); ?>">
+                        <label for="response" class="form-label">Select Your Response</label>
+                        <select class="form-select" id="response" name="response" required>
+                            <option value="">-- Select an Option --</option>
+                            <?php foreach ($options as $option) { ?>
+                                <option value="<?php echo htmlspecialchars($option); ?>" 
+                                    <?php echo ($option === $current_response) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($option); ?>
+                                </option>
+                            <?php } ?>
+                        </select>
                     </div>
                     <div class="text-center">
                         <button type="submit" class="btn btn-primary">Submit Vote</button>
