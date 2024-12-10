@@ -15,6 +15,13 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 $user = $result->fetch_assoc();
+
+// Fetch the user's current vote
+$stmt = $mysqli->prepare('SELECT response FROM votes WHERE user_id = ?');
+$stmt->bind_param('i', $user['id']);
+$stmt->execute();
+$vote_result = $stmt->get_result();
+$current_vote = $vote_result->num_rows > 0 ? $vote_result->fetch_assoc()['response'] : "No vote yet";
 ?>
 
 <!DOCTYPE html>
@@ -41,7 +48,7 @@ $user = $result->fetch_assoc();
                     <div class="card-body">
                         <div class="mb-3">
                             <h5>Welcome, <?php echo htmlspecialchars($user['email']); ?>!</h5>
-                            <p class="text-muted">We're glad to have you back. Here's your information:</p>
+                            <p class="text-muted">Here's your information:</p>
                         </div>
                         <ul class="list-group">
                             <li class="list-group-item">
@@ -50,6 +57,11 @@ $user = $result->fetch_assoc();
                             <li class="list-group-item">
                                 <strong>Last Logged In:</strong> 
                                 <?php echo $user['last_logged_in'] ? htmlspecialchars($user['last_logged_in']) : "Never"; ?>
+                            </li>
+                            <li class="list-group-item">
+                                <strong>My Vote:</strong> 
+                                <?php echo htmlspecialchars($current_vote); ?>
+                                <a href="vote.php" class="btn btn-sm btn-secondary float-end">Change My Vote</a>
                             </li>
                         </ul>
                         <div class="mt-4 text-center">
