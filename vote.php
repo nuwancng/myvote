@@ -72,9 +72,9 @@ $current_response = $current_vote['response'] ?? '';
                         </form>
 
                         <!-- Logout Button -->
-                        <div class="mt-4 text-center">
+                        <!--<div class="mt-4 text-center">
                             <a href="logout.php" class="btn btn-danger">Logout</a>
-                        </div>
+                        </div>-->
                     </div>
                 </div>
                 <!-- End of Voting Card -->
