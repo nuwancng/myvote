@@ -22,6 +22,20 @@ $stmt->bind_param('i', $user['id']);
 $stmt->execute();
 $vote_result = $stmt->get_result();
 $current_vote = $vote_result->num_rows > 0 ? $vote_result->fetch_assoc()['response'] : "No vote yet";
+
+// Fetch response counts and percentages
+$total_votes_query = $mysqli->query('SELECT COUNT(*) as total FROM votes');
+$total_votes = $total_votes_query->fetch_assoc()['total'];
+
+$response_stats_query = $mysqli->query('SELECT response, COUNT(*) as count FROM votes GROUP BY response');
+$response_stats = [];
+while ($row = $response_stats_query->fetch_assoc()) {
+    $response_stats[] = [
+        'response' => $row['response'],
+        'count' => $row['count'],
+        'percentage' => $total_votes > 0 ? round(($row['count'] / $total_votes) * 100, 2) : 0
+    ];
+}
 ?>
 
 <!DOCTYPE html>
@@ -58,12 +72,31 @@ $current_vote = $vote_result->num_rows > 0 ? $vote_result->fetch_assoc()['respon
                                 <strong>Last Logged In:</strong> 
                                 <?php echo $user['last_logged_in'] ? htmlspecialchars($user['last_logged_in']) : "Never"; ?>
                             </li>
-                            <li class="list-group-item">
-                                <strong>My Vote:</strong> 
-                                <?php echo htmlspecialchars($current_vote); ?>
-                                <a href="vote.php" class="btn btn-sm btn-secondary float-end">Change My Vote</a>
-                            </li>
                         </ul>
+
+                        <div class="mt-4">
+                            <h5>My Vote</h5>
+                            <ul class="list-group mb-3">
+                                <li class="list-group-item">
+                                    <strong>Status:</strong> <?php echo htmlspecialchars($current_vote); ?>
+                                    <a href="vote.php" class="btn btn-sm btn-secondary float-end">Change My Vote</a>
+                                </li>
+                            </ul>
+
+                            <h5>Vote Summary</h5>
+                            <ul class="list-group">
+                                <?php foreach ($response_stats as $stat) : ?>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <?php echo htmlspecialchars($stat['response']); ?>
+                                        <span>
+                                            <?php echo $stat['count']; ?> votes 
+                                            (<?php echo $stat['percentage']; ?>%)
+                                        </span>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+
                         <div class="mt-4 text-center">
                             <a href="logout.php" class="btn btn-danger">Logout</a>
                         </div>
