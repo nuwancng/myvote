@@ -8,31 +8,43 @@ if (!isset($_SESSION['email'])) {
     exit();
 }
 
-$mysqli = db_connect();
-$stmt = $mysqli->prepare('SELECT id FROM users WHERE email = ?');
-$stmt->bind_param('s', $_SESSION['email']);
-$stmt->execute();
-$result = $stmt->get_result();
-$user = $result->fetch_assoc();
+// Check if the form was submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['response'])) {
+    $response = trim($_POST['response']);
 
-// Check if the user already has a vote
-$stmt = $mysqli->prepare('SELECT * FROM votes WHERE user_id = ?');
-$stmt->bind_param('i', $user['id']);
-$stmt->execute();
-$vote_result = $stmt->get_result();
+    $mysqli = db_connect();
 
-if ($vote_result->num_rows > 0) {
-    // Update existing vote
-    $stmt = $mysqli->prepare('UPDATE votes SET response = ? WHERE user_id = ?');
+    // Fetch user details
+    $stmt = $mysqli->prepare('SELECT id FROM users WHERE email = ?');
+    $stmt->bind_param('s', $_SESSION['email']);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $user = $result->fetch_assoc();
+
+    if ($user) {
+        $user_id = $user['id'];
+
+        // Insert or update vote
+        $stmt = $mysqli->prepare('
+            INSERT INTO votes (user_id, response) 
+            VALUES (?, ?)
+            ON DUPLICATE KEY UPDATE response = ?
+        ');
+        $stmt->bind_param('iss', $user_id, $response, $response);
+
+        if ($stmt->execute()) {
+            $_SESSION['message'] = 'Your vote has been successfully submitted/changed!';
+        } else {
+            $_SESSION['message'] = 'An error occurred while submitting your vote.';
+        }
+    } else {
+        $_SESSION['message'] = 'Unable to find your user details.';
+    }
+
+    header('Location: vote.php');
+    exit();
 } else {
-    // Insert new vote
-    $stmt = $mysqli->prepare('INSERT INTO votes (user_id, response) VALUES (?, ?)');
+    $_SESSION['message'] = 'Invalid request.';
+    header('Location: vote.php');
+    exit();
 }
-
-$stmt->bind_param('si', $user['id'], $_POST['response']);
-$stmt->execute();
-
-$_SESSION['message'] = 'Your vote has been successfully submitted/changed!';
-header('Location: vote.php');
-exit();
-?>
