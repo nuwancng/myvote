@@ -1,9 +1,9 @@
 <?php
 function db_connect() {
     $host = 'localhost';
-    $user = 'root';
-    $pass = '';
-    $db = 'user_system';
+    $user = 'cpeusalcdl_myvote';
+    $pass = '8OIQ1d,TccJw';
+    $db = 'cpeusalcdl_myvote';
 
     $mysqli = new mysqli($host, $user, $pass, $db);
 
