@@ -12,6 +12,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($input_otp == $_SESSION['otp']) {
+
+        $_SESSION['loggedin'] = true;
+
         $mysqli = db_connect();
 
         $email = $_SESSION['email'];
