@@ -61,9 +61,8 @@ $current_response = $current_vote['response'] ?? '';
                                 <label for="response" class="form-label">Your Response</label>
                                 <select class="form-select" id="response" name="response" required>
                                     <option value="" disabled>Select your option</option>
-                                    <option value="Yes" <?php echo $current_response === 'Yes' ? 'selected' : ''; ?>>Yes</option>
-                                    <option value="No" <?php echo $current_response === 'No' ? 'selected' : ''; ?>>No</option>
-                                    <option value="Maybe" <?php echo $current_response === 'Maybe' ? 'selected' : ''; ?>>Maybe</option>
+                                    <option value="Democratic Party (DNC)" <?php echo $current_response === 'Yes' ? 'selected' : ''; ?>>Democratic Party (DNC)</option>
+                                    <option value="Republican Party (RNC)" <?php echo $current_response === 'No' ? 'selected' : ''; ?>>Republican Party (RNC)</option>
                                 </select>
                             </div>
                             <div class="text-center">
