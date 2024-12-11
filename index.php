@@ -3,7 +3,7 @@ session_start();
 require_once('db_connection.php');
 
 // Check if the user is already logged in
-if (isset($_SESSION['email'])) {
+if (isset($_SESSION['loggedin'])) {
     header('Location: dashboard.php');
     exit();
 }
